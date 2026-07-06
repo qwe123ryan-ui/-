@@ -1,0 +1,207 @@
+/* Global application styles for ORG Shaan Pro Professional Workstation */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Cairo", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-brand-glow: #ff7300;
+  --color-brand-glowing-green: #00ff66;
+  
+  /* YAMAHA Official Color Specifications */
+  --color-yamaha-gold: #c4a44a;
+  --color-yamaha-gold-bright: #d4b85a;
+  --color-yamaha-gold-dark: #8a6a28;
+}
+
+/* Theme definition block defining variables */
+.theme-steel {
+  --chassis-from: #2e2e3a;
+  --chassis-via: #161622;
+  --chassis-to: #12121c;
+  --chassis-border: #4a4a58;
+  --trim-from: #1c1c24;
+  --trim-via: #14141e;
+  --trim-to: #0c0c14;
+  --trim-border: #2c2c38;
+  --deck-from: #282836;
+  --deck-to: #1a1a26;
+  --deck-border: #383848;
+  --panel-bg: rgba(30,30,44,0.65);
+  --panel-border: #2d2d3c;
+  --inner-bg: #13131d;
+  --inner-border: #2c2c38;
+}
+
+.theme-wood {
+  --chassis-from: #421e0e;
+  --chassis-via: #220e06;
+  --chassis-to: #120502;
+  --chassis-border: #5d2b14;
+  --trim-from: #2d140a;
+  --trim-via: #1c0a04;
+  --trim-to: #100401;
+  --trim-border: #421d0a;
+  --deck-from: #351a10;
+  --deck-to: #1d0e06;
+  --deck-border: #4c2211;
+  --panel-bg: rgba(36,16,7,0.78);
+  --panel-border: #4a210d;
+  --inner-bg: #1e0903;
+  --inner-border: #3d1b0a;
+}
+
+/* Apply CSS variables dynamically to structural elements */
+#yamahaMNOrgChassis {
+  background: linear-gradient(to bottom, var(--chassis-from), var(--chassis-via, #161622), var(--chassis-to)) !important;
+  border-color: var(--chassis-border) !important;
+  transition: background 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaTopHeaderTrim {
+  background: linear-gradient(to right, var(--trim-from), var(--trim-via, #14141e), var(--trim-to)) !important;
+  border-color: var(--trim-border) !important;
+  transition: background 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaControlContainerDeck {
+  background: linear-gradient(to bottom, var(--deck-from), var(--deck-to)) !important;
+  border-color: var(--deck-border) !important;
+  transition: background 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaLeftControlBay,
+#yamahaRightControlBay {
+  background-color: var(--panel-bg) !important;
+  border-color: var(--panel-border) !important;
+  transition: background-color 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaBrandTrimRow,
+#yamahaTactileWheels,
+#yamahaRotarySlidersBlock,
+#yamahaPerformanceFilters,
+#yamahaArpeggiatorConsole,
+#yamahaEffectsDelayRow,
+#yamahaQuarterToneDeck,
+#yamahaCustomPresetsVault,
+#yamahaEqualizerRow {
+  background-color: var(--inner-bg) !important;
+  border-color: var(--inner-border) !important;
+  transition: background-color 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaKeybed {
+  border-color: var(--deck-border, #252530) !important;
+  background-color: var(--inner-bg, #0c0c14) !important;
+  transition: background-color 0.50s ease, border-color 0.50s ease;
+}
+
+#yamahaElectronicSequencer {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  border-color: var(--panel-border, #23232e) !important;
+  transition: background-color 0.50s ease, border-color 0.50s ease;
+}
+
+/* Custom interactive and physical simulation styles */
+.lcd-glow-orange {
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+}
+
+.lcd-glow-green {
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.7), 0 0 4px rgba(34, 197, 94, 0.4);
+}
+
+.led-glow-orange {
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.8), inset 0 0 4px rgba(249, 115, 22, 0.5);
+}
+
+.led-glow-red {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8), inset 0 0 4px rgba(239, 68, 68, 0.5);
+}
+
+.led-glow-green {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.85), inset 0 0 4px rgba(34, 197, 94, 0.6);
+}
+
+.led-glow-gold {
+  box-shadow: 0 0 12px rgba(196, 164, 74, 0.85), inset 0 0 4px rgba(196, 164, 74, 0.6);
+}
+
+/* Scrollbar styling for industrial logs/recordings list */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f0f15;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e3e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3e3e4e;
+}
+
+/* Real-world tactile piano key skins & styles */
+.white-key-active {
+  background: linear-gradient(to bottom, #ece8e0 0%, #ffd482 60%, #ffbe40 100%) !important;
+  transform: translateY(2.5px) scaleY(0.985);
+  border-bottom-width: 1px !important;
+  box-shadow: inset 0 6px 8px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  z-index: 10 !important;
+}
+
+.black-key-active {
+  background: linear-gradient(to bottom, #11111a 0%, #c4a44a 80%, #d4b85a 100%) !important;
+  transform: scaleY(0.97) translateY(1.5px);
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
+  z-index: 25 !important;
+}
+
+/* LCD Phosphor Micro-Glow Layer Filter */
+.yamaha-phosphor-glass {
+  position: relative;
+  overflow: hidden;
+}
+.yamaha-phosphor-glass::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Realistic dial indentation shadows */
+.physical-inset {
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255, 255, 255, 0.04);
+}
+
+.physical-bezel {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* الوضع الأفقي للهاتف — التصميم الأساسي */
+@media (orientation: landscape) and (max-width: 844px) {
+  .workstation {
+    transform: scale(0.44);
+    transform-origin: top left;
+    width: 1920px;
+    height: 720px;
+  }
+}
+
+/* إخفاء بعض العناصر في الشاشات الصغيرة */
+@media (max-width: 480px) {
+  .zone-b, .zone-d { display: none; } /* الأعمدة الوسطى */
+  .main-display { height: 180px; }
+}
+
+

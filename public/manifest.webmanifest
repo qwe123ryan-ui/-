@@ -1,0 +1,14 @@
+{
+  "name": "ORG24 Workstation",
+  "short_name": "ORG24",
+  "description": "محطة عمل موسيقية احترافية",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#1E2028",
+  "theme_color": "#E87722",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

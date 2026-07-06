@@ -1,0 +1,6 @@
+{
+  "name": "ORG Shaan Pro",
+  "description": "Premium MN-ORG 24 Professional Oriental and Arabic musical keyboard workstation scaled at 1920x1080 with 13 custom interactive in-app pages, Web Audio synthesis, and dynamic maqam scales.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

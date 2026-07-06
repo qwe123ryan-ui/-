@@ -1,0 +1,1189 @@
+<!-- MN-ORG 24 Professional Arranger Keyboard Console Root -->
+<div id="yamahaConsole" class="min-h-screen bg-[#111317] text-[#e8eaed] flex flex-col w-full font-sans select-none overflow-hidden relative" dir="rtl">
+  
+  <!-- 🧭 TOP CONTROL HEADER -->
+  <div class="w-full flex justify-between items-center bg-[#1a1d24] border-b border-white/5 px-6 py-4 z-50 shadow-md" id="yamahaTopBar">
+    <div class="flex items-center gap-4">
+      <div class="w-3.5 h-3.5 rounded-full bg-[#00b894] led-glowing-green animate-pulse"></div>
+      <div class="flex flex-col">
+        <span class="text-md font-black text-[#f5c542] tracking-wider font-display">لوحة الأورج الهندسي الاحترافي — MN-ORG 24</span>
+        <span class="text-[11px] text-stone-400 font-mono uppercase tracking-widest">PRO LEVEL 1920x1080 DESIGN GRID</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Quick Information and Info bar -->
+      <span class="text-xs font-mono text-stone-400 bg-stone-900 px-3 py-1.5 rounded-md border border-white/5">
+        الآلة النشطة: <strong class="text-[#f5c542]">{{ activeInstrument() | uppercase }}</strong>
+      </span>
+      <span class="text-xs font-mono text-stone-400 bg-stone-900 px-3 py-1.5 rounded-md border border-white/5">
+        الإيقاع: <strong class="text-[#00b894]">{{ activeRhythm() | uppercase }}</strong>
+      </span>
+
+      <!-- Theme Selector -->
+      <button (click)="toggleTheme()" 
+              class="px-3 py-1.5 text-xs font-bold bg-[#2c3038] border border-white/5 hover:border-[#f5c542]/50 text-[#f5c542] rounded-lg cursor-pointer transition-all">
+        🎨 المظهر: {{ activeTheme() === 'steel' ? 'فولاذ داكن (Steel)' : 'خشب كلاسيكي (Wood)' }}
+      </button>
+
+      <!-- Reset/Power -->
+      <button (click)="enginePower.set(!enginePower())" 
+              [class]="'px-4 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ' + 
+                       (enginePower() ? 'bg-[#d63031] text-white border-[#d63031]' : 'bg-stone-900 text-stone-500 border-stone-800')">
+        🔌 الطاقة: {{ enginePower() ? 'نشط ON' : 'مطفأ OFF' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- 🎛️ COCKPIT CONTAINER (STRETCHED & SCALED) -->
+  <div class="flex-1 w-full flex justify-center items-center overflow-auto bg-[#111317] p-4 relative" style="min-height: 880px;">
+    
+    <!-- Heavy Chassis Board scaled dynamically -->
+    <div class="workstation origin-top transition-all duration-300 relative select-none rounded-[24px] overflow-hidden border-[4px] border-[#2c3038] shadow-[0_40px_90px_rgba(0,0,0,0.95)]"
+         [class.theme-wood]="activeTheme() === 'wood'"
+         [class.theme-steel]="activeTheme() === 'steel'"
+         style="width: 1920px; height: 920px; min-width: 1920px; min-height: 920px; background-color: #1a1d24;"
+         [style.transform]="'scale(' + zoomScale() + ')'">
+
+      <!-- ======================================================== -->
+      <!-- SECTION 1: VERTICAL TABS SIDEBAR (LEFT) - Width 40px -->
+      <!-- ======================================================== -->
+      <div class="absolute left-0 top-0 w-10 h-[360px] bg-gradient-to-r from-stone-900 to-stone-850 border-r border-white/5 flex flex-col justify-start items-center gap-1 py-4 z-40" id="left-sidebar">
+        <!-- Dashboard / Main Tab -->
+        <button (click)="activePage.set('dashboard')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-r border-y border-r border-white/5 ' + 
+                         (activePage() === 'dashboard' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="الواجهة الرئيسية">
+          <span class="rotate-90 origin-center whitespace-nowrap block">MAIN</span>
+        </button>
+
+        <!-- Mixer / Slider Tab -->
+        <button (click)="selectPage('mixer')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-r border-y border-r border-white/5 ' + 
+                         (activePage() === 'mixer' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="خلاط الأصوات">
+          <span class="rotate-90 origin-center whitespace-nowrap block">SLIDER</span>
+        </button>
+
+        <!-- Effects Tab -->
+        <button (click)="selectPage('effects')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-r border-y border-r border-white/5 ' + 
+                         (activePage() === 'effects' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="المؤثرات الرقمية">
+          <span class="rotate-90 origin-center whitespace-nowrap block">EFFECT</span>
+        </button>
+
+        <!-- Style Browser Tab -->
+        <button (click)="selectPage('styles')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-r border-y border-r border-white/5 ' + 
+                         (activePage() === 'styles' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="مكتبة الإيقاعات">
+          <span class="rotate-90 origin-center whitespace-nowrap block">STYLE</span>
+        </button>
+
+        <!-- Drum Sequencer Tab -->
+        <button (click)="selectPage('drums')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-r border-y border-r border-white/5 ' + 
+                         (activePage() === 'drums' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="مسجل وسيكوانسر الطبول">
+          <span class="rotate-90 origin-center whitespace-nowrap block">DRUM</span>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 2: VERTICAL TABS SIDEBAR (RIGHT) - Width 40px -->
+      <!-- ======================================================== -->
+      <div class="absolute right-0 top-0 w-10 h-[360px] bg-gradient-to-l from-stone-900 to-stone-850 border-l border-white/5 flex flex-col justify-start items-center gap-1 py-4 z-40" id="right-sidebar">
+        <!-- Mirroring Left Sidebar for seamless access -->
+        <button (click)="activePage.set('dashboard')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-l border-y border-l border-white/5 ' + 
+                         (activePage() === 'dashboard' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="الرئيسية">
+          <span class="-rotate-90 origin-center whitespace-nowrap block">MAIN</span>
+        </button>
+
+        <button (click)="selectPage('mixer')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-l border-y border-l border-white/5 ' + 
+                         (activePage() === 'mixer' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="الخلاط">
+          <span class="-rotate-90 origin-center whitespace-nowrap block">SLIDER</span>
+        </button>
+
+        <button (click)="selectPage('effects')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-l border-y border-l border-white/5 ' + 
+                         (activePage() === 'effects' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="التأثيرات">
+          <span class="-rotate-90 origin-center whitespace-nowrap block">EFFECT</span>
+        </button>
+
+        <button (click)="selectPage('styles')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-l border-y border-l border-white/5 ' + 
+                         (activePage() === 'styles' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="الإيقاع">
+          <span class="-rotate-90 origin-center whitespace-nowrap block">STYLE</span>
+        </button>
+
+        <button (click)="selectPage('drums')"
+                [class]="'w-9 h-14 text-[9px] font-black flex items-center justify-center transition-all cursor-pointer rounded-l border-y border-l border-white/5 ' + 
+                         (activePage() === 'drums' ? 'bg-[#f5c542] text-black shadow-[0_0_10px_#f5c542]' : 'bg-[#2c3038] text-[#e8eaed] hover:bg-stone-700')"
+                title="الطبول">
+          <span class="-rotate-90 origin-center whitespace-nowrap block">DRUM</span>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 3: LEFT CONTROL PANEL - Width 420px, Height 360px -->
+      <!-- ======================================================== -->
+      <div class="absolute left-10 top-0 w-[420px] h-[360px] bg-[#22252d] border-r border-white/5 p-4 flex flex-col justify-between" id="left-panel">
+        
+        <!-- Row 1: DNC Group (top-left) & Script Button -->
+        <div class="relative w-full h-[40px] flex items-center gap-2">
+          <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">DNC VOICES</div>
+          <div class="flex items-center gap-1.5">
+            <!-- DNC Buttons -->
+            @for (num of [1, 2, 3]; track num) {
+              <button (click)="activeDNC.set(num)"
+                      [class]="'w-[54px] h-[28px] text-[10px] font-bold rounded border cursor-pointer flex items-center justify-center transition-all ' + 
+                               (activeDNC() === num ? 'bg-[#00b894] text-black border-[#00b894] shadow-[0_0_8px_#00b894]' : 'bg-[#2c3038] text-stone-300 border-white/5 hover:border-stone-500')">
+                DNC {{ num }}
+              </button>
+            }
+          </div>
+
+          <!-- Script Code Automation Button -->
+          <button (click)="selectPage('script')"
+                  class="absolute right-0 top-0 w-[84px] h-[28px] text-[10px] font-black bg-[#d63031] text-white rounded border border-[#d63031] cursor-pointer flex items-center justify-center hover:bg-[#ff4d4d] transition-all shadow-[0_0_6px_#d63031]">
+            AUTOMATION
+          </button>
+        </div>
+
+        <!-- Row 2: Analog Knobs Section (Volume, Balance) -->
+        <div class="flex justify-around items-center py-2 bg-black/15 rounded-xl border border-white/5">
+          <!-- MASTER VOLUME Knob -->
+          <div class="flex flex-col items-center gap-1.5">
+            <span class="text-[10px] font-black text-[#f5c542] tracking-widest uppercase font-mono">MASTER VOL</span>
+            <button class="relative flex items-center justify-center rounded-full border-[3px] border-stone-850 bg-gradient-to-br from-[#c0c5ce] to-[#4a4e57] shadow-lg cursor-pointer hover:brightness-110 active:scale-95 transition-all p-0 overflow-hidden"
+                 style="width: 64px; height: 64px;"
+                 (click)="cycleVolume()"
+                 aria-label="Master Volume">
+              <!-- Pointer indicator line -->
+              <div class="absolute w-0.5 h-6 bg-white origin-bottom bottom-1/2 rounded pointer-events-none"
+                   [style.transform]="'rotate(' + ((masterVolume() * 270) - 135) + 'deg)'"></div>
+            </button>
+            <span class="text-[10px] font-mono text-stone-400">{{ (masterVolume() * 100) | number:'1.0-0' }}%</span>
+          </div>
+
+          <!-- BALANCE Knob -->
+          <div class="flex flex-col items-center gap-1.5">
+            <span class="text-[10px] font-black text-stone-400 tracking-widest uppercase font-mono">BALANCE KBD</span>
+            <button class="relative flex items-center justify-center rounded-full border-[3px] border-stone-850 bg-gradient-to-br from-[#c0c5ce] to-[#4a4e57] shadow-lg cursor-pointer hover:brightness-110 active:scale-95 transition-all p-0 overflow-hidden"
+                 style="width: 64px; height: 64px;"
+                 (click)="cycleBalance()"
+                 aria-label="Keyboard Balance">
+              <!-- Pointer indicator line -->
+              <div class="absolute w-0.5 h-6 bg-[#f5c542] origin-bottom bottom-1/2 rounded pointer-events-none"
+                   [style.transform]="'rotate(' + ((balance() * 270) - 135) + 'deg)'"></div>
+            </button>
+            <span class="text-[10px] font-mono text-stone-400">
+              {{ balance() === 0.5 ? 'CENTER' : balance() === 0.0 ? 'L100' : 'R100' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Row 3: Tactile Side Buttons Group & Auto Fill & Stop -->
+        <div class="grid grid-cols-2 gap-3 bg-black/10 p-2.5 rounded-xl border border-white/5">
+          <div class="flex flex-col gap-2">
+            <!-- AFTER TOUCH Button -->
+            <button (click)="isAftertouchActive.set(!isAftertouchActive())"
+                    [class]="'w-full h-[32px] text-[10px] font-bold rounded border cursor-pointer transition-all ' + 
+                             (isAftertouchActive() ? 'bg-[#00b894] text-black border-[#00b894]' : 'bg-[#2c3038] text-stone-300 border-white/5')">
+              AFTER TOUCH
+            </button>
+            <!-- METRONOME Button -->
+            <button (click)="toggleMetronomeClick()"
+                    [class]="'w-full h-[32px] text-[10px] font-bold rounded border cursor-pointer transition-all ' + 
+                             (isMetronomeActive() ? 'bg-[#00b894] text-black border-[#00b894]' : 'bg-[#2c3038] text-stone-300 border-white/5')">
+              METRONOME
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <!-- MIC Button -->
+            <button (click)="isMicActive.set(!isMicActive())"
+                    [class]="'w-full h-[32px] text-[10px] font-bold rounded border cursor-pointer transition-all ' + 
+                             (isMicActive() ? 'bg-[#00b894] text-black border-[#00b894]' : 'bg-[#2c3038] text-stone-300 border-white/5')">
+              MIC / ANALYZER
+            </button>
+            <!-- MIDI Setup trigger Button -->
+            <button (click)="selectPage('midi')"
+                    [class]="'w-full h-[32px] text-[10px] font-bold rounded border cursor-pointer transition-all ' + 
+                             (activePage() === 'midi' ? 'bg-[#f5c542] text-black border-[#f5c542]' : 'bg-[#2c3038] text-stone-300 border-white/5')">
+              🔌 MIDI SETUP
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 4: Auto Fill LED button, Stop, and Pad matrix launcher triggers -->
+        <div class="flex justify-between items-center bg-black/20 p-2 rounded-xl border border-white/5 gap-2">
+          <!-- AUTO FILL Button -->
+          <button (click)="isAutoFillActive.set(!isAutoFillActive())"
+                  [class]="'w-[92px] h-[36px] text-[10px] font-black rounded-lg border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isAutoFillActive() ? 'bg-emerald-950/40 border-[#00b894] text-[#00b894]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span class="text-[8px] font-bold tracking-wider">AUTO FILL</span>
+            <!-- Glowing LED Indicator -->
+            <div [class]="'w-2 h-2 rounded-full mt-0.5 ' + (isAutoFillActive() ? 'bg-[#00b894] led-glowing-green' : 'bg-stone-700')"></div>
+          </button>
+
+          <!-- STOP Button -->
+          <button (click)="stopRhythmLoop()"
+                  class="w-[72px] h-[36px] text-[10px] font-black bg-[#d63031] text-white rounded-lg border border-[#d63031] hover:bg-[#ff4d4d] cursor-pointer flex items-center justify-center transition-all shadow-[inset_0_1px_3px_rgba(255,255,255,0.2)]">
+            STOP
+          </button>
+
+          <!-- Dynamic Pads triggers matrix -->
+          <div class="flex-1 flex justify-around items-center gap-1 bg-stone-900/60 p-1.5 rounded-lg border border-white/5">
+            @for (padNum of [1, 2, 3, 4]; track padNum) {
+              <button (click)="triggerPad(padNum)"
+                      class="w-[42px] h-[30px] text-[9px] font-black bg-[#3a3f4a] border border-white/5 hover:bg-[#f5c542] hover:text-black rounded cursor-pointer transition-all flex items-center justify-center">
+                PAD {{ padNum }}
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 4: GAP CONTROLS (LEFT GAPS) - Width 200px (460 to 660) -->
+      <!-- ======================================================== -->
+      <div class="zone-b absolute left-[460px] top-0 w-[200px] h-[360px] bg-[#1a1d24] border-r border-white/5 p-4 flex flex-col justify-start gap-4" id="left-gap-controls">
+        <span class="text-[9px] font-black text-stone-400 uppercase tracking-widest font-mono text-center">PAGE NAVIGATION</span>
+        
+        <!-- MODE Selector -->
+        <button (click)="selectPage('settings')"
+                class="w-full h-[36px] text-xs font-black bg-[#3a3f4a] border border-white/10 hover:border-[#f5c542]/50 text-stone-300 rounded-lg cursor-pointer flex items-center justify-center shadow-md transition-all">
+          ⚙️ MODE / SYSTEM
+        </button>
+
+        <!-- TAB Button (Opens Sound Library) -->
+        <button (click)="selectPage('sounds')"
+                [class]="'w-full h-[36px] text-xs font-black rounded-lg border cursor-pointer flex items-center justify-center shadow-md transition-all ' + 
+                         (activePage() === 'sounds' ? 'bg-[#f5c542] text-black border-[#f5c542] shadow-[0_0_10px_#f5c542]' : 'bg-[#3a3f4a] text-stone-300 border-white/10')">
+          🎛️ TAB / SOUNDS
+        </button>
+
+        <!-- RECORD/PLAY Button (Opens multi-track recorder) -->
+        <button (click)="selectPage('recorder')"
+                [class]="'w-full h-[44px] text-xs font-black rounded-lg border cursor-pointer flex items-center justify-center shadow-lg transition-all ' + 
+                         (activePage() === 'recorder' ? 'bg-[#d63031] text-white border-[#d63031] shadow-[0_0_10px_#d63031]' : 'bg-[#3a3f4a] text-stone-300 border-white/10')">
+          🔴 RECORD / PLAY
+        </button>
+
+        <!-- Q.T. Quarter-Tone Scale Preset Button -->
+        <button (click)="selectPage('settings')"
+                class="w-full h-[36px] text-xs font-black bg-[#3a3f4a] border border-white/10 hover:border-[#f5c542]/50 text-[#f5c542] rounded-lg cursor-pointer flex items-center justify-center shadow-md transition-all">
+          🕌 Q.T. / MAQAMS
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 5: CENTRAL MONITOR SCREEN (600 × 240 px, x:660, y:20) -->
+      <!-- ======================================================== -->
+      <div class="main-display absolute left-[660px] top-[20px] w-[600px] h-[240px] rounded-2xl border-[3px] border-[#0a0a0a] shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col justify-between p-4 font-mono select-none"
+           id="digitalMonitorLcd">
+        
+        <!-- Screen top bar with status/timers and micro logos -->
+        <div class="flex justify-between items-center text-[11px] text-[#00b894] font-black tracking-widest font-mono z-10">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#00b894] led-glowing-green"></span>
+            <span>SYSTEM MONITOR</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span>BPM: <strong>{{ tempoBpm() }}</strong></span>
+            <span>|</span>
+            <span>FREQ: <strong>{{ lastPressedFrequency() }}</strong></span>
+          </div>
+          <!-- Clock with Saudi Arabic locale formatted -->
+          <span class="text-[#f5c542] font-black">{{ currentTimeString() }}</span>
+        </div>
+
+        <!-- Giant central glowing Arranger Keyboard logo and stage details -->
+        <div class="flex-1 flex flex-col justify-center items-center relative z-10">
+          <!-- Backdrop stage bands effect -->
+          <div class="absolute inset-0 bg-gradient-to-t from-red-950/20 via-transparent to-transparent pointer-events-none rounded"></div>
+          
+          <div class="flex items-center gap-3">
+            <!-- Vector Logo icon featuring piano lines styled inside character O -->
+            <div class="relative w-16 h-16 flex items-center justify-center bg-black/40 border border-white/10 rounded-full shadow-inner">
+              <span class="text-3xl font-black text-[#e8eaed] leading-none select-none">O</span>
+              <!-- Piano Keys lines inside character O -->
+              <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-0.5">
+                <span class="w-1 h-3 bg-white"></span>
+                <span class="w-[3px] h-2 bg-black"></span>
+                <span class="w-1 h-3 bg-white"></span>
+                <span class="w-[3px] h-2 bg-black"></span>
+                <span class="w-1 h-3 bg-white"></span>
+              </div>
+            </div>
+            
+            <div class="flex flex-col">
+              <span class="text-5xl font-black text-white tracking-widest drop-shadow-[0_4px_12px_rgba(255,255,255,0.25)] font-display uppercase">MN-ORG 24</span>
+              <span class="text-xs text-[#ff6b6b] italic font-semibold tracking-widest mt-1 uppercase">ARRANGER WORKSTATION</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom bar displaying keys played and chord metadata -->
+        <div class="flex justify-between items-center text-[11px] text-stone-300 font-bold border-t border-white/10 pt-1.5 z-10">
+          <div class="flex items-center gap-1">
+            <span>القسم النشط:</span>
+            <span class="text-[#f5c542] font-mono">{{ lastPressedNoteName() }}</span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <!-- Auto accompaniment chord memory string -->
+            <span class="text-[#ff6b6b] font-black uppercase">CHORD SCAN: ON</span>
+            <span class="text-[9px] bg-red-950/60 border border-red-500/30 px-1.5 py-0.5 rounded text-white font-mono animate-pulse">LEGATO ACTIVE</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 6: GAP CONTROLS (RIGHT GAPS) - Width 200px (1260 to 1460) -->
+      <!-- ======================================================== -->
+      <div class="zone-d absolute left-[1260px] top-0 w-[200px] h-[360px] bg-[#1a1d24] border-l border-white/5 p-4 flex flex-col justify-start gap-3" id="right-gap-controls">
+        <span class="text-[9px] font-black text-stone-400 uppercase tracking-widest font-mono text-center">SYSTEM ACTIONS</span>
+        
+        <!-- MENU Button -->
+        <button (click)="selectPage('settings')"
+                class="w-full h-[36px] text-xs font-bold bg-[#3a3f4a] border border-white/10 hover:border-[#f5c542]/50 text-stone-300 rounded-lg cursor-pointer flex items-center justify-center shadow-md transition-all">
+          📑 MENU
+        </button>
+
+        <!-- EXIT Button (Surgically exits current overlay back to Dashboard) -->
+        <button (click)="exitPage()"
+                class="w-full h-[36px] text-xs font-black bg-[#d63031] border border-[#d63031] text-white hover:bg-[#ff4d4d] rounded-lg cursor-pointer flex items-center justify-center shadow-lg transition-all">
+          🔙 EXIT / BACK
+        </button>
+
+        <!-- SPLIT/MIX toggle -->
+        <button (click)="isSplitMixActive.set(!isSplitMixActive())"
+                [class]="'w-full h-[44px] text-xs font-black rounded-lg border cursor-pointer flex flex-col items-center justify-center shadow-lg transition-all ' + 
+                         (isSplitMixActive() ? 'bg-[#2c3038] border-[#f5c542] text-[#f5c542]' : 'bg-[#3a3f4a] text-stone-300 border-white/10')">
+          <span class="text-[10px]">SPLIT / MIX PANEL</span>
+          <div [class]="'w-2 h-2 rounded-full mt-0.5 ' + (isSplitMixActive() ? 'bg-[#f5c542] led-glowing-orange' : 'bg-stone-700')"></div>
+        </button>
+
+        <!-- CHORD MEMORY Dictionary Button -->
+        <button (click)="selectPage('chords')"
+                [class]="'w-full h-[44px] text-xs font-black rounded-lg border cursor-pointer flex flex-col items-center justify-center shadow-lg transition-all ' + 
+                         (activePage() === 'chords' ? 'bg-[#2c3038] border-sky-400 text-sky-400' : 'bg-[#3a3f4a] text-stone-300 border-white/10')">
+          <span class="text-[10px]">CHORD DICTIONARY</span>
+          <div [class]="'w-2 h-2 rounded-full mt-0.5 ' + (activePage() === 'chords' ? 'bg-sky-400 led-glowing-blue shadow-[0_0_8px_#38bdf8]' : 'bg-stone-700')"></div>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 7: RIGHT CONTROL PANEL - Width 420px, Height 360px -->
+      <!-- ======================================================== -->
+      <div class="absolute left-[1460px] top-0 w-[420px] h-[360px] bg-[#22252d] border-l border-white/5 p-4 flex flex-col justify-between" id="right-panel">
+        
+        <!-- Row 1: Large TEMPO Knob & Controls -->
+        <div class="flex justify-between items-center py-2 bg-black/20 rounded-xl border border-white/5 px-3">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-[9px] font-black text-stone-400 uppercase tracking-widest font-mono">TEMPO DIAL (BPM)</span>
+            <div class="flex items-center gap-1">
+              <button (click)="setTempoDown()" class="w-8 h-8 bg-[#3a3f4a] border border-white/5 text-white font-bold rounded-lg cursor-pointer flex items-center justify-center hover:bg-stone-750">-</button>
+              <span class="w-14 text-center font-mono font-black text-2xl text-[#f5c542]">{{ tempoBpm() }}</span>
+              <button (click)="setTempoUp()" class="w-8 h-8 bg-[#3a3f4a] border border-white/5 text-white font-bold rounded-lg cursor-pointer flex items-center justify-center hover:bg-stone-750">+</button>
+            </div>
+          </div>
+
+          <!-- Circular Large TEMPO Dial (110px diameter) -->
+          <button class="relative flex items-center justify-center rounded-full border-[3px] border-stone-850 bg-gradient-to-br from-[#c0c5ce] to-[#4a4e57] shadow-xl cursor-pointer hover:brightness-110 active:scale-95 transition-all p-0 overflow-hidden"
+               style="width: 88px; height: 88px;"
+               (click)="setTempoUp()"
+               aria-label="Tempo Dial">
+            <!-- Pointer indicator line rotating symmetrically -->
+            <div class="absolute w-0.5 h-8 bg-black origin-bottom bottom-1/2 rounded pointer-events-none"
+                 [style.transform]="'rotate(' + (((tempoBpm() - 40) / 200 * 270) - 135) + 'deg)'"></div>
+          </button>
+        </div>
+
+        <!-- Row 2: Right Control Options (Octave, Transpose, lock) -->
+        <div class="grid grid-cols-3 gap-2 bg-black/10 p-2 rounded-xl border border-white/5">
+          <!-- LOCK -->
+          <button (click)="isLockActive.set(!isLockActive())"
+                  [class]="'h-[30px] text-[10px] font-bold rounded border cursor-pointer transition-all ' + 
+                           (isLockActive() ? 'bg-[#00b894] text-black border-[#00b894]' : 'bg-[#2c3038] text-stone-300 border-white/5')">
+            🔒 LOCK
+          </button>
+
+          <!-- OCTAVE SHIFT -->
+          <button (click)="octaveShift.set(octaveShift() === 2 ? -2 : octaveShift() + 1)"
+                  class="h-[30px] text-[10px] font-bold bg-[#2c3038] border border-white/5 text-stone-300 rounded cursor-pointer hover:border-stone-500 flex items-center justify-center transition-all">
+            OCT: {{ octaveShift() > 0 ? '+' : '' }}{{ octaveShift() }}
+          </button>
+
+          <!-- TRANSPOSE -->
+          <button (click)="transposeShift.set(transposeShift() === 12 ? -12 : transposeShift() + 1)"
+                  class="h-[30px] text-[10px] font-bold bg-[#2c3038] border border-white/5 text-[#f5c542] rounded cursor-pointer hover:border-[#f5c542]/50 flex items-center justify-center transition-all">
+            TRANS: {{ transposeShift() > 0 ? '+' : '' }}{{ transposeShift() }}
+          </button>
+        </div>
+
+        <!-- Row 3: Accompaniment Scan and Mute status triggers -->
+        <div class="grid grid-cols-4 gap-1.5 bg-black/25 p-2 rounded-xl border border-white/5">
+          <!-- CHORD SCAN LOWER -->
+          <button (click)="isChordScanLowerActive.set(!isChordScanLowerActive())"
+                  [class]="'h-[36px] text-[8px] font-black rounded border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isChordScanLowerActive() ? 'bg-[#2c3038] border-[#00b894] text-[#00b894]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span>SCAN LOWER</span>
+            <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isChordScanLowerActive() ? 'bg-[#00b894] led-glowing-green' : 'bg-stone-700')"></div>
+          </button>
+
+          <!-- CHORD SCAN UPPER -->
+          <button (click)="isChordScanUpperActive.set(!isChordScanUpperActive())"
+                  [class]="'h-[36px] text-[8px] font-black rounded border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isChordScanUpperActive() ? 'bg-[#2c3038] border-[#00b894] text-[#00b894]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span>SCAN UPPER</span>
+            <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isChordScanUpperActive() ? 'bg-[#00b894] led-glowing-green' : 'bg-stone-700')"></div>
+          </button>
+
+          <!-- CHORD MUTE -->
+          <button (click)="isChordMuteActive.set(!isChordMuteActive())"
+                  [class]="'h-[36px] text-[8px] font-black rounded border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isChordMuteActive() ? 'bg-[#2c3038] border-[#d63031] text-[#d63031]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span>CHORD MUTE</span>
+            <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isChordMuteActive() ? 'bg-[#d63031] led-glowing-red' : 'bg-stone-700')"></div>
+          </button>
+
+          <!-- DRUM MUTE -->
+          <button (click)="isDrumMuteActive.set(!isDrumMuteActive())"
+                  [class]="'h-[36px] text-[8px] font-black rounded border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isDrumMuteActive() ? 'bg-[#2c3038] border-[#d63031] text-[#d63031]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span>DRUM MUTE</span>
+            <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isDrumMuteActive() ? 'bg-[#d63031] led-glowing-red' : 'bg-stone-700')"></div>
+          </button>
+        </div>
+
+        <!-- Row 4: KEYBOARD SET preset selector slots -->
+        <div class="flex justify-between items-center bg-black/15 p-1.5 rounded-xl border border-white/5 gap-1.5">
+          <div class="text-[8px] font-black text-stone-400 uppercase tracking-widest font-mono">KBD SET</div>
+          <div class="flex-1 flex justify-around items-center gap-1 bg-stone-900/60 p-1 rounded-lg border border-white/5">
+            @for (setSlot of [1, 2, 3, 4]; track setSlot) {
+              <button (click)="selectKbdSetPreset(setSlot)"
+                      [class]="'w-[34px] h-[28px] text-[10px] font-black rounded border cursor-pointer flex items-center justify-center transition-all ' + 
+                               (selectedKbdSet() === setSlot ? 'bg-[#f5c542] text-black border-[#f5c542] shadow-[0_0_6px_#f5c542]' : 'bg-[#3a3f4a] border-white/5 text-stone-300')">
+                {{ setSlot }}
+              </button>
+            }
+          </div>
+
+          <!-- STYLE TO KBD SET -->
+          <button (click)="isStyleToKbdActive.set(!isStyleToKbdActive())"
+                  [class]="'w-[84px] h-[32px] text-[8px] font-black rounded border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                           (isStyleToKbdActive() ? 'bg-[#2c3038] border-[#d63031] text-[#d63031]' : 'bg-[#2c3038] text-stone-400 border-white/5')">
+            <span>STYLE TO KBD</span>
+            <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isStyleToKbdActive() ? 'bg-[#d63031] led-glowing-red' : 'bg-stone-700')"></div>
+          </button>
+
+          <!-- MY SETTING Slots manager trigger Button -->
+          <button (click)="selectPage('my_settings')"
+                  [class]="'w-[64px] h-[32px] text-[8px] font-black rounded border cursor-pointer flex items-center justify-center transition-all ' + 
+                           (activePage() === 'my_settings' ? 'bg-[#f5c542] text-black border-[#f5c542]' : 'bg-[#3a3f4a] border-white/5 text-stone-300')">
+            💾 STORE
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 8: MIDDLE CONTROL STRIP (1920 × 140 px, y:360 to 500) -->
+      <!-- ======================================================== -->
+      <div class="absolute left-10 top-[360px] w-[1840px] h-[140px] bg-[#1a1d24] border-y border-white/5 p-3 flex flex-col justify-between" id="control-strip">
+        
+        <!-- Row 1: Main Capsule Buttons and synchro status indicators -->
+        <div class="flex justify-between items-center px-4">
+          
+          <div class="flex items-center gap-2">
+            <!-- SYNCHRO START -->
+            <button (click)="isSynchroStartActive.set(!isSynchroStartActive())"
+                    [class]="'w-[92px] h-[32px] text-[9px] font-black rounded-full border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                             (isSynchroStartActive() ? 'bg-emerald-950/40 border-[#00b894] text-[#00b894]' : 'bg-[#3a3f4a] text-stone-400 border-white/5')">
+              <span>SYNCHRO START</span>
+              <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isSynchroStartActive() ? 'bg-[#00b894] led-glowing-green' : 'bg-stone-700')"></div>
+            </button>
+
+            <!-- SYNCHRO STOP -->
+            <button (click)="isSynchroStopActive.set(!isSynchroStopActive())"
+                    [class]="'w-[92px] h-[32px] text-[9px] font-black rounded-full border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                             (isSynchroStopActive() ? 'bg-emerald-950/40 border-[#00b894] text-[#00b894]' : 'bg-[#3a3f4a] text-stone-400 border-white/5')">
+              <span>SYNCHRO STOP</span>
+              <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isSynchroStopActive() ? 'bg-[#00b894] led-glowing-green' : 'bg-stone-700')"></div>
+            </button>
+          </div>
+
+          <!-- Red Capsule Start/Stop rhythm button -->
+          <button (click)="toggleRhythmBeat('saeedi')"
+                  class="w-[180px] h-[40px] text-xs font-black bg-[#d63031] text-white rounded-full border-2 border-white/10 hover:bg-[#ff4d4d] cursor-pointer flex items-center justify-center shadow-[0_4px_12px_rgba(214,48,49,0.4)] transition-all transform active:scale-95">
+            🛑 RHYTHM START / STOP
+          </button>
+
+          <div class="flex items-center gap-2">
+            <!-- RESET TAP TEMPO -->
+            <button (click)="resetMasterTuning()"
+                    class="w-[92px] h-[32px] text-[9px] font-black bg-[#3a3f4a] border border-white/5 text-stone-300 rounded-full cursor-pointer hover:border-stone-500 flex items-center justify-center transition-all">
+              RESET TUNING
+            </button>
+
+            <!-- FADE IN/OUT -->
+            <button (click)="isFadeInOutActive.set(!isFadeInOutActive())"
+                    [class]="'w-[92px] h-[32px] text-[9px] font-black rounded-full border cursor-pointer flex flex-col items-center justify-center transition-all ' + 
+                             (isFadeInOutActive() ? 'bg-amber-950/40 border-[#f5c542] text-[#f5c542]' : 'bg-[#3a3f4a] text-stone-400 border-white/5')">
+              <span>FADE IN / OUT</span>
+              <div [class]="'w-1.5 h-1.5 rounded-full mt-0.5 ' + (isFadeInOutActive() ? 'bg-[#f5c542] led-glowing-orange' : 'bg-stone-700')"></div>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Row 2: Arranger Section Buttons Groups (Intro, Variation, Fill, Break, Ending) -->
+        <div class="flex justify-between items-center gap-2 bg-black/35 px-4 py-1.5 rounded-xl border border-white/5 overflow-x-auto">
+          <!-- INTRO Group -->
+          <div class="flex items-center gap-1">
+            <span class="text-[8px] font-bold text-stone-400 uppercase tracking-widest font-mono">INTRO</span>
+            @for (num of [1, 2, 3]; track num) {
+              <button (click)="loadDrumPreset('shaabi')"
+                      class="w-[54px] h-[32px] text-[9px] font-black bg-[#2c3038] border border-white/5 text-stone-300 rounded cursor-pointer hover:bg-[#3a3f4a] transition-all">
+                {{ num }}
+              </button>
+            }
+          </div>
+
+          <!-- VARIATION Group -->
+          <div class="flex items-center gap-1">
+            <span class="text-[8px] font-bold text-[#f5c542] uppercase tracking-widest font-mono">VARIATION</span>
+            @for (num of [1, 2, 3, 4]; track num) {
+              <button (click)="loadDrumPreset(num === 1 ? 'shaabi' : num === 2 ? 'hiphop' : num === 3 ? 'dabke' : 'house')"
+                      class="w-[54px] h-[32px] text-[9px] font-black bg-[#2c3038] border border-white/5 text-stone-300 rounded cursor-pointer hover:bg-[#3a3f4a] transition-all">
+                {{ num }}
+              </button>
+            }
+          </div>
+
+          <!-- FILL Group -->
+          <div class="flex items-center gap-1">
+            <span class="text-[8px] font-bold text-[#00b894] uppercase tracking-widest font-mono">FILL</span>
+            @for (num of [1, 2, 3, 4]; track num) {
+              <button (click)="toggleRhythmBeat('saeedi')"
+                      class="w-[54px] h-[32px] text-[9px] font-black bg-[#2c3038] border border-white/5 text-stone-300 rounded cursor-pointer hover:bg-[#3a3f4a] transition-all">
+                {{ num }}
+              </button>
+            }
+          </div>
+
+          <!-- BREAK + ENDING Group -->
+          <div class="flex items-center gap-1">
+            <span class="text-[8px] font-bold text-[#ff6b6b] uppercase tracking-widest font-mono">BREAK</span>
+            <button (click)="toggleRhythmBeat('none')"
+                    class="w-[72px] h-[32px] text-[9px] font-black bg-[#2c3038] border border-[#ff6b6b]/30 text-[#ff6b6b] rounded cursor-pointer hover:bg-stone-750 transition-all uppercase">
+              BREAK
+            </button>
+            
+            <span class="text-[8px] font-bold text-stone-400 uppercase tracking-widest font-mono ml-2">ENDING</span>
+            @for (num of [1, 2, 3]; track num) {
+              <button (click)="stopRhythmLoop()"
+                      class="w-[54px] h-[32px] text-[9px] font-black bg-[#2c3038] border border-white/5 text-stone-300 rounded cursor-pointer hover:bg-[#3a3f4a] transition-all">
+                {{ num }}
+              </button>
+            }
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 9: KEYBOARD AREA (1920 × 380 px, y:500 to 880) -->
+      <!-- ======================================================== -->
+      <div class="absolute left-0 top-[500px] w-[1920px] h-[380px] bg-gradient-to-b from-[#111317] to-black border-t border-stone-800 flex flex-col justify-between" id="keyboard-bay">
+        <div class="relative w-full h-[360px] overflow-hidden" id="keybed-container">
+          
+          <!-- White keys container (Z-index 10) -->
+          <div class="absolute inset-0 flex z-10" id="white-keys-container">
+            @for (key of keys; track key.midi) {
+              @if (!key.isBlack) {
+                <div class="h-[360px] relative border-r border-stone-900 cursor-pointer flex flex-col justify-end items-center pb-8 select-none transition-all"
+                     style="width: 120px;"
+                     [class]="activeNotesMap()[key.midi] ? 'bg-gradient-to-b from-[#f5c542] to-[#c4a44a] shadow-inner text-black font-black' : 'bg-gradient-to-b from-stone-50 via-[#f5f5f5] to-stone-200 text-stone-900 hover:brightness-95'"
+                     (mousedown)="onKeyMouseDown(key, $event)"
+                     (mouseenter)="isMouseDownOnKeys && onKeyMouseEnter(key)"
+                     (mouseleave)="onKeyMouseLeave(key)"
+                     (mouseup)="onKeyMouseUp(key)"
+                     (touchstart)="onKeyTouchStart(key, $event)"
+                     (touchend)="onKeyTouchEnd(key, $event)">
+                  
+                  <!-- Responsive Key Note Label with colors as specified -->
+                  <div class="flex flex-col items-center select-none pointer-events-none">
+                    <!-- Arabic Note Class Name -->
+                    <span class="text-xs font-semibold select-none font-sans">{{ key.arabicLabel }}</span>
+                    <!-- English Note Label with custom green/red octave markers -->
+                    <span [class]="'text-sm font-black tracking-tighter mt-1 select-none font-mono ' + 
+                                   (key.colorLabel === 'green' ? 'text-emerald-600' : 'text-red-600')">
+                      {{ key.label }}
+                    </span>
+                    <!-- Computer Trigger keyboard characters -->
+                    @if (key.keyboardLabel) {
+                      <span class="text-[9px] bg-stone-300 text-stone-700 px-1 rounded font-black mt-2 select-none border border-stone-400/50">{{ key.keyboardLabel }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Black keys overlapping container (Z-index 20) -->
+          <div class="absolute inset-x-0 top-0 h-[220px] pointer-events-none z-20" id="black-keys-container">
+            @for (key of keys; track key.midi) {
+              @if (key.isBlack) {
+                <div class="absolute h-[220px] pointer-events-auto cursor-pointer rounded-b-md flex flex-col justify-end items-center pb-4 transition-all shadow-[0_5px_10px_rgba(0,0,0,0.5)] select-none border-x border-b border-black"
+                     style="width: 72px;"
+                     [style.left.px]="key.leftOffsetPct"
+                     [class]="activeNotesMap()[key.midi] ? 'bg-gradient-to-b from-[#f5c542] to-[#c4a44a] text-black font-black' : 'bg-gradient-to-b from-stone-850 via-[#1a1a1a] to-black hover:brightness-125 text-white'"
+                     (mousedown)="onKeyMouseDown(key, $event)"
+                     (mouseenter)="isMouseDownOnKeys && onKeyMouseEnter(key)"
+                     (mouseleave)="onKeyMouseLeave(key)"
+                     (mouseup)="onKeyMouseUp(key)"
+                     (touchstart)="onKeyTouchStart(key, $event)"
+                     (touchend)="onKeyTouchEnd(key, $event)">
+                  
+                  <div class="flex flex-col items-center select-none pointer-events-none">
+                    <!-- Arabic Note Class Name -->
+                    <span class="text-[10px] font-bold select-none font-sans text-stone-300">{{ key.arabicLabel }}</span>
+                    <!-- English Note Label -->
+                    <span class="text-xs font-black text-[#f5c542] font-mono select-none mt-1">{{ key.label }}</span>
+                    <!-- Keyboard Trigger characters -->
+                    @if (key.keyboardLabel) {
+                      <span class="text-[8px] bg-stone-800 text-stone-300 px-1 rounded font-black mt-1 select-none border border-stone-700">{{ key.keyboardLabel }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION 10: BOTTOM BEZEL STAND SECTION (880 to 920 px) -->
+      <!-- ======================================================== -->
+      <div class="absolute left-0 top-[880px] w-[1920px] h-[40px] bg-[#111317] border-t border-white/5 flex items-center px-8 text-xs text-stone-500 font-mono" id="cabinet-footer">
+        <div class="w-full text-stone-400 font-sans flex justify-between items-center gap-4">
+          <span class="text-[#f5c542] font-black shrink-0">حالة النظام STAT:</span>
+          <span class="truncate">🕌 أهلاً بك في نظام **MN-ORG 24** الهندسي المطور للتقاسيم والمقامات الشرقية. انقر على **TAB** لتصفح الأصوات، و **LIVE STYLE** لتشغيل الإيقاعات، و **CHORD DICTIONARY** لتعلم المقامات والأكوردات.</span>
+          <span class="text-[#00b894] font-bold shrink-0 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-[#00b894] led-glowing-green"></span>
+            <span>متصل وجاهز</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- ================================================================================================================ -->
+      <!-- IN-APP PAGES OVERLAY AREA (Coordinates x:40px to 1880px, y:20px to 480px) -->
+      <!-- ================================================================================================================ -->
+      @if (activePage() !== 'dashboard') {
+        <div class="absolute left-10 top-2 w-[1840px] h-[480px] bg-[#1a1d24] border-[3px] border-stone-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.95)] z-50 flex flex-col p-6 animate-fade-in" id="pages-overlay">
+          
+          <!-- Page Overlay Header -->
+          <div class="w-full flex justify-between items-center border-b border-white/5 pb-4 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="w-3 h-3 rounded-full bg-[#f5c542] led-glowing-orange"></span>
+              <h2 class="text-2xl font-black text-white font-sans tracking-wide">
+                @switch (activePage()) {
+                  @case ('sounds') { 🕌 مكتبة الأصوات والآلات الموسيقية — Sound Library }
+                  @case ('styles') { 🥁 متصفح ومُهندس الإيقاعات — Style Browser }
+                  @case ('drums') { 🎚️ لوحة الطبول والسيكوانسر — Drum Kit & Sequencer }
+                  @case ('mixer') { 🎚️ وحدة خلاط الأصوات والهندسة — Slider Mixer }
+                  @case ('effects') { 🎛️ وحدة مؤثرات الصدى والفلاتر — Effects Rack }
+                  @case ('settings') { ⚙️ الإعدادات العامة والربع تون — Maqam Settings }
+                  @case ('chords') { 🎹 قاموس ومُعلم الأكوردات — Chord Dictionary }
+                  @case ('recorder') { 🔴 مسجل التيب الصوتي الاحترافي — Tape Recorder }
+                  @case ('midi') { 🔌 موصلات وقنوات الميدي — MIDI Configuration }
+                  @case ('script') { 📜 محرر برمجيات الأتمتة — Script Automation }
+                  @case ('my_settings') { 💾 حفظ واستدعاء الجلسات المخصصة — Presets Bank }
+                }
+              </h2>
+            </div>
+            
+            <!-- EXIT BUTTON -->
+            <button (click)="exitPage()"
+                    class="px-5 py-2 text-sm font-black bg-[#d63031] text-white hover:bg-[#ff4d4d] rounded-lg border border-[#d63031] cursor-pointer shadow-lg transition-all flex items-center gap-2">
+              <mat-icon class="text-sm">close</mat-icon>
+              <span>إغلاق الصفحة EXIT</span>
+            </button>
+          </div>
+
+          <!-- Page Content Switcher -->
+          <div class="flex-1 overflow-auto pr-2" id="pages-content">
+            
+            <!-- 1. SOUND LIBRARY PAGE -->
+            @if (activePage() === 'sounds') {
+              <div class="grid grid-cols-3 gap-6 h-full">
+                <!-- Left: Instruments Selectors list -->
+                <div class="col-span-2 grid grid-cols-3 gap-3">
+                  @for (soundPack of soundPacks(); track soundPack.id) {
+                    @for (inst of soundPack.instruments; track inst.key) {
+                      <button (click)="selectInstrument(inst.key)"
+                              [class]="'p-4 rounded-xl border flex flex-col justify-between text-right cursor-pointer transition-all ' + 
+                                       (activeInstrument() === inst.key ? 'bg-gradient-to-br from-[#c4a44a]/20 to-[#8a6a28]/20 border-[#f5c542] text-white shadow-lg' : 'bg-[#2c3038] border-white/5 hover:border-stone-500 text-stone-300')">
+                        <span class="text-sm font-black">{{ inst.arabicName }}</span>
+                        <span class="text-[10px] font-mono text-stone-400 mt-2 uppercase">{{ inst.name }}</span>
+                        <!-- Tiny preview audio trigger -->
+                        <div class="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
+                          <span class="text-[8px] font-mono text-stone-400 bg-black/40 px-1.5 py-0.5 rounded uppercase">{{ inst.wave }}</span>
+                          <span class="text-[9px] text-[#f5c542] font-semibold">عزف تجريبي 🎵</span>
+                        </div>
+                      </button>
+                    }
+                  }
+                </div>
+
+                <!-- Right: Interactive ADSR Envelope Graph -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider uppercase font-mono">ADSR ENVELOPE CONTROLS</span>
+                  <div class="w-full h-32 bg-black/40 rounded-lg my-3 border border-white/5 flex items-end justify-center px-4 relative">
+                    <!-- SVG Visualizing ADSR Wave -->
+                    <svg class="absolute inset-0 w-full h-full text-[#f5c542]" viewBox="0 0 100 100" preserveAspectRatio="none">
+                      <path d="M 0 100 L 15 20 L 40 50 L 80 50 L 100 100" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span class="absolute top-2 left-3 text-[9px] font-mono text-[#f5c542]">REAL-TIME ENVELOPE MODULATION</span>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-xs text-stone-300">
+                      <span>ATTACK (زمن البدء)</span>
+                      <strong class="text-[#00b894] font-mono">0.02s</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" value="0.02" class="w-full cursor-pointer">
+
+                    <div class="flex justify-between items-center text-xs text-stone-300 mt-2">
+                      <span>DECAY (زمن الاضمحلال)</span>
+                      <strong class="text-[#f5c542] font-mono">0.45s</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" value="0.45" class="w-full cursor-pointer">
+
+                    <div class="flex justify-between items-center text-xs text-stone-300 mt-2">
+                      <span>SUSTAIN (مستوى الثبات)</span>
+                      <strong class="text-[#00b894] font-mono">0.80</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" value="0.8" class="w-full cursor-pointer">
+
+                    <div class="flex justify-between items-center text-xs text-stone-300 mt-2">
+                      <span>RELEASE (زمن التلاشي)</span>
+                      <strong class="text-[#ff6b6b] font-mono">0.95s</strong>
+                    </div>
+                    <input type="range" min="0" max="2" step="0.05" value="0.95" class="w-full cursor-pointer">
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 2. STYLE BROWSER PAGE -->
+            @if (activePage() === 'styles') {
+              <div class="grid grid-cols-4 gap-4 h-full">
+                @for (rhythm of ['saeedi', 'bayati', 'dabke', 'maqsum', 'baladi', 'house', 'hiphop']; track rhythm) {
+                  <div [class]="'p-4 rounded-xl border flex flex-col justify-between ' + 
+                                (activeRhythm() === rhythm ? 'bg-gradient-to-br from-emerald-950/20 to-teal-950/20 border-[#00b894]' : 'bg-[#2c3038] border-white/5')">
+                    <div class="flex flex-col text-right">
+                      <span class="text-sm font-black text-white">
+                        {{ rhythm === 'saeedi' ? 'إيقاع صعيدي بلدي' : rhythm === 'bayati' ? 'إيقاع بياتي طربي' : rhythm === 'dabke' ? 'إيقاع دبكة جبلية' : rhythm === 'maqsum' ? 'إيقاع مقسوم شعبي' : rhythm === 'baladi' ? 'إيقاع بلدي كلاسيك' : rhythm === 'house' ? 'إيقاع دي جي غربي' : 'هيب هوب هادئ' }}
+                      </span>
+                      <span class="text-[10px] font-mono text-stone-400 mt-1 uppercase">{{ rhythm | uppercase }} SEQUENCE</span>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-4">
+                      <!-- Play/Stop toggle -->
+                      <button (click)="toggleRhythmBeat(rhythm)"
+                              [class]="'px-4 py-1.5 text-xs font-black rounded-lg cursor-pointer transition-all ' + 
+                                       (activeRhythm() === rhythm ? 'bg-[#d63031] text-white' : 'bg-stone-900 text-[#00b894] hover:bg-black')">
+                        {{ activeRhythm() === rhythm ? 'إيقاف 🛑' : 'تشغيل 🥁' }}
+                      </button>
+
+                      <!-- BPM Sync marker -->
+                      <div class="flex items-center gap-1 text-[10px] font-mono text-[#f5c542]">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#00b894] led-glowing-green"></span>
+                        <span>BPM SYNCED</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- 3. DRUM KIT EDITOR PAGE -->
+            @if (activePage() === 'drums') {
+              <div class="flex flex-col gap-4 h-full">
+                <!-- Drum Pads Matrix launcher triggers -->
+                <div class="grid grid-cols-8 gap-3">
+                  @for (padName of ['kick', 'snare', 'closedHat', 'openHat', 'darbukaDum', 'darbukaTak', 'darbukaSak', 'cowbell']; track padName) {
+                    <button (click)="playDrumSound(padName)"
+                            class="p-4 bg-[#2c3038] border border-white/5 hover:bg-[#00b894] hover:text-black rounded-xl text-center font-black cursor-pointer transition-all">
+                      🥁 {{ padName | uppercase }}
+                    </button>
+                  }
+                </div>
+
+                <!-- 16-Step drum matrix sequencer arrangement grid -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">16-STEP DRUM SEQUENCE ARRANGER</span>
+                  <div class="flex flex-col gap-3 mt-4">
+                    @for (track of ['kick', 'snare', 'closedHat', 'openHat']; track track) {
+                      <div class="flex items-center gap-3">
+                        <span class="w-24 text-xs font-black text-stone-300 uppercase font-mono text-right">{{ track }}</span>
+                        <div class="flex-1 grid grid-cols-16 gap-1">
+                          @for (step of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]; track step) {
+                            <button (click)="toggleSequencerStep(track, step)"
+                                    class="h-8 rounded cursor-pointer transition-all border border-stone-850"
+                                    [class]="step % 4 === 0 ? 'border-l-2 border-stone-600' : ''"
+                                    style="background-color: #1a1d24;">
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 4. MIXER / SLIDER PAGE -->
+            @if (activePage() === 'mixer') {
+              <div class="grid grid-cols-10 gap-3 h-full px-4 py-2 bg-[#2c3038] rounded-xl border border-white/5">
+                @for (channel of ['Master', 'Upper', 'Lower', 'Style', 'Drum', 'Lead', 'Bass', 'Pad', 'Reverb', 'Delay']; track channel) {
+                  <div class="flex flex-col justify-between items-center h-full p-2 bg-black/15 border border-white/5 rounded-lg">
+                    <!-- VU Peak indicator LED -->
+                    <div class="flex flex-col gap-0.5 w-2 bg-stone-900 rounded-full h-8 p-0.5 justify-end">
+                      <div class="w-full bg-[#d63031] h-1 rounded mb-0.5 animate-pulse"></div>
+                      <div class="w-full bg-[#f5c542] h-2 rounded mb-0.5 animate-pulse"></div>
+                      <div class="w-full bg-[#00b894] h-3 rounded"></div>
+                    </div>
+
+                    <!-- Fader bar range slider -->
+                    <div class="h-44 flex items-center justify-center my-2">
+                      <input type="range" min="0" max="1" step="0.05" value="0.7" 
+                             style="writing-mode: vertical-lr; direction: rtl; width: 8px; height: 160px;"
+                             class="cursor-pointer">
+                    </div>
+
+                    <!-- Mute Toggle -->
+                    <button class="w-12 py-1 text-[9px] bg-stone-900 border border-white/5 text-stone-300 rounded font-bold hover:bg-stone-800 transition-all">
+                      MUTE
+                    </button>
+
+                    <!-- Label -->
+                    <span class="text-[10px] font-black text-stone-300 font-mono mt-1 uppercase">{{ channel }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- 5. EFFECTS RACK PAGE -->
+            @if (activePage() === 'effects') {
+              <div class="grid grid-cols-3 gap-6 h-full">
+                <!-- Reverb FX -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">REVERB (صدى الصوت الغنائي)</span>
+                  <div class="flex flex-col gap-3 mt-4">
+                    <div class="flex justify-between text-xs text-stone-300">
+                      <span>REVERB SIZE (حجم القاعة)</span>
+                      <strong class="text-[#00b894] font-mono">Large Room</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.1" value="0.7" class="w-full cursor-pointer">
+
+                    <div class="flex justify-between text-xs text-stone-300 mt-2">
+                      <span>WET MIX (مستوى الخلط)</span>
+                      <strong class="text-[#f5c542] font-mono">{{ (reverbWet() * 100) | number:'1.0-0' }}%</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" [value]="reverbWet()" (input)="onReverbWetChange($event)" class="w-full cursor-pointer">
+                  </div>
+                </div>
+
+                <!-- Delay FX -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">ANALOG DELAY (تأخير التكرار)</span>
+                  <div class="flex flex-col gap-3 mt-4">
+                    <div class="flex justify-between text-xs text-stone-300">
+                      <span>FEEDBACK (تأخير الصدى)</span>
+                      <strong class="text-[#ff6b6b] font-mono">{{ (delayFeedback() * 100) | number:'1.0-0' }}%</strong>
+                    </div>
+                    <input type="range" min="0" max="0.9" step="0.05" [value]="delayFeedback()" (input)="updateDelayFeedback(+$any($event.target).value)" class="w-full cursor-pointer">
+
+                    <div class="flex justify-between text-xs text-stone-300 mt-2">
+                      <span>DELAY LEVEL (مستوى التكرار)</span>
+                      <strong class="text-[#f5c542] font-mono">{{ (delayLevel() * 100) | number:'1.0-0' }}%</strong>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.05" [value]="delayLevel()" (input)="updateDelayLevel(+$any($event.target).value)" class="w-full cursor-pointer">
+                  </div>
+                </div>
+
+                <!-- 3-Band Equalizer EQ -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">3-BAND EQUALIZER (معدل الذبذبات)</span>
+                  <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+                    <!-- Low -->
+                    <div class="flex flex-col items-center">
+                      <span class="text-[10px] text-stone-400 font-mono">BASS</span>
+                      <input type="range" min="-12" max="12" step="1" [value]="eqLow()" (input)="updateEqLow(+$any($event.target).value)" style="writing-mode: vertical-lr; height: 100px;" class="my-2 cursor-pointer">
+                      <span class="text-xs font-mono text-[#00b894]">{{ eqLow() }} dB</span>
+                    </div>
+                    <!-- Mid -->
+                    <div class="flex flex-col items-center">
+                      <span class="text-[10px] text-stone-400 font-mono">MID</span>
+                      <input type="range" min="-12" max="12" step="1" [value]="eqMid()" (input)="updateEqMid(+$any($event.target).value)" style="writing-mode: vertical-lr; height: 100px;" class="my-2 cursor-pointer">
+                      <span class="text-xs font-mono text-[#f5c542]">{{ eqMid() }} dB</span>
+                    </div>
+                    <!-- High -->
+                    <div class="flex flex-col items-center">
+                      <span class="text-[10px] text-stone-400 font-mono">TREBLE</span>
+                      <input type="range" min="-12" max="12" step="1" [value]="eqHigh()" (input)="updateEqHigh(+$any($event.target).value)" style="writing-mode: vertical-lr; height: 100px;" class="my-2 cursor-pointer">
+                      <span class="text-xs font-mono text-[#ff6b6b]">{{ eqHigh() }} dB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 6. SYSTEM SETTINGS & MAQAMS PAGE -->
+            @if (activePage() === 'settings') {
+              <div class="grid grid-cols-3 gap-6 h-full">
+                <!-- Tuning Scale presets (Arabic Maqams) -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">ARABIC MAQAM SCALES (المقامات الشرقية)</span>
+                  <div class="grid grid-cols-2 gap-2 mt-4">
+                    @for (scale of ['bayati', 'rast', 'sika', 'saba', 'huzam', 'chromatic', 'custom']; track scale) {
+                      <button (click)="applyScalePreset(scale)"
+                              [class]="'py-2 text-xs font-black rounded border cursor-pointer transition-all ' + 
+                                       (activeScalePreset() === scale ? 'bg-[#f5c542] text-black border-[#f5c542]' : 'bg-[#1a1d24] text-stone-300 border-white/5 hover:border-stone-500')">
+                        {{ scale === 'bayati' ? 'مقام بياتي 🕌' : scale === 'rast' ? 'مقام راست 🕌' : scale === 'sika' ? 'مقام سيكاه 🕌' : scale === 'saba' ? 'مقام صبا 🕌' : scale === 'huzam' ? 'مقام هزام 🕌' : scale === 'chromatic' ? 'غربي كامل' : 'ضبط حر مخصص' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Custom Scale interactive quarter-tone piano keys matrix -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">QUARTER TONE TUNING (-50 CENTS)</span>
+                  <div class="grid grid-cols-12 gap-1 mt-4 text-center">
+                    @for (noteKey of ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']; track noteKey; let idx = $index) {
+                      <button (click)="toggleQuarterToneNote(idx)"
+                              [class]="'py-4 text-[10px] font-mono font-bold rounded border cursor-pointer transition-all ' + 
+                                       (quarterTones()[idx] ? 'bg-red-950/40 border-red-500 text-[#ff4d4d]' : 'bg-stone-900 border-white/5 text-stone-400')">
+                        {{ noteKey }}
+                        <div [class]="'w-1.5 h-1.5 rounded-full mx-auto mt-2 ' + (quarterTones()[idx] ? 'bg-red-500 led-glowing-red' : 'bg-stone-800')"></div>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Master System Fine-Tuning -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">FINE MASTER TUNING (ضبط المقدار)</span>
+                  <div class="flex flex-col gap-4 mt-4">
+                    <div class="flex justify-between text-xs text-stone-300">
+                      <span>SYSTEM CALIBRATION</span>
+                      <strong class="text-[#00b894] font-mono">440.0 Hz (A4)</strong>
+                    </div>
+                    <input type="range" min="415" max="466" step="1" value="440" class="w-full cursor-pointer">
+                    <span class="text-[10px] text-stone-400 font-mono text-center">TUNE TO CHROMATIC HERZ STANDARD</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 7. CHORD DICTIONARY PAGE -->
+            @if (activePage() === 'chords') {
+              <div class="grid grid-cols-3 gap-6 h-full">
+                <!-- Chord presets matrices lists -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">CHORD FORMULA SELECTOR</span>
+                  <div class="grid grid-cols-2 gap-2.5 mt-4">
+                    @for (type of ['major', 'minor', '7th', 'dim', 'aug', 'sus4']; track type) {
+                      <button (click)="selectedChordType.set(type)"
+                              [class]="'py-2.5 text-xs font-bold rounded border cursor-pointer transition-all ' + 
+                                       (selectedChordType() === type ? 'bg-sky-500 text-black border-sky-500 shadow-[0_0_8px_#38bdf8]' : 'bg-stone-900 text-stone-300 border-white/5')">
+                        {{ type | uppercase }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Root Note Selector -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">CHORD ROOT NOTE (MIDI)</span>
+                  <div class="grid grid-cols-4 gap-2 mt-4 text-center">
+                    @for (note of ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5']; track note; let idx = $index) {
+                      <button (click)="selectedChordRoot.set(60 + (idx === 7 ? 12 : idx * 2))"
+                              [class]="'py-2 text-xs font-mono font-bold rounded border cursor-pointer transition-all ' + 
+                                       (selectedChordRoot() === (60 + (idx === 7 ? 12 : idx * 2)) ? 'bg-sky-500 text-black border-sky-500' : 'bg-stone-900 text-stone-300 border-white/5')">
+                        {{ note }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Play Sound & mini preview interactive keys -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between text-center">
+                  <span class="text-xs font-black text-stone-300 font-mono tracking-wider">CHORD AUDITION TRG</span>
+                  <button (click)="playChordPreset(selectedChordRoot(), selectedChordType())"
+                          class="w-full py-4 text-sm font-black bg-sky-500 hover:bg-sky-400 text-black rounded-xl cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.4)] transition-all">
+                    🔊 PLAY AUDITION CHORD (عزف الأكورد)
+                  </button>
+                  <span class="text-[10px] text-stone-400 font-mono">SELECTED CHORD ROOT AND TYPE WILL SOUND IN UNISON</span>
+                </div>
+              </div>
+            }
+
+            <!-- 8. RECORDER PAGE -->
+            @if (activePage() === 'recorder') {
+              <div class="grid grid-cols-2 gap-6 h-full">
+                <!-- Left: Cassette tape deck animated loops -->
+                <div class="bg-[#2c3038] p-6 rounded-xl border border-white/5 flex flex-col justify-between items-center text-center">
+                  <span class="text-xs font-black text-stone-400 tracking-wider">TAPE DECK REELS (مسجل الصوت)</span>
+                  
+                  <!-- Tape animation graphic -->
+                  <div class="w-72 h-36 bg-stone-900 border-2 border-stone-800 rounded-xl p-4 flex items-center justify-between relative shadow-inner">
+                    <div class="w-16 h-16 rounded-full border-4 border-stone-700 bg-stone-950 flex items-center justify-center">
+                      <div class="w-6 h-6 rounded-full bg-[#f5c542] animate-spin"></div>
+                    </div>
+                    <div class="w-20 h-4 bg-stone-800 rounded"></div>
+                    <div class="w-16 h-16 rounded-full border-4 border-stone-700 bg-stone-950 flex items-center justify-center">
+                      <div class="w-6 h-6 rounded-full bg-[#f5c542] animate-spin"></div>
+                    </div>
+                  </div>
+
+                  <!-- Recorder Controls -->
+                  <div class="flex items-center gap-3">
+                    <button class="px-4 py-2 bg-[#d63031] hover:bg-red-500 text-white font-bold rounded-lg cursor-pointer transition-all">RECORD 🔴</button>
+                    <button class="px-4 py-2 bg-[#3a3f4a] text-white font-bold rounded-lg cursor-pointer transition-all">PLAY ◀️</button>
+                    <button class="px-4 py-2 bg-stone-900 text-stone-500 font-bold rounded-lg cursor-pointer transition-all">STOP ⏹️</button>
+                  </div>
+                </div>
+
+                <!-- Right: Saved recording tape sessions lists -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider">SAVED TAPES RECORDINGS</span>
+                  <div class="flex-1 overflow-auto bg-stone-900/60 rounded-lg p-3 my-3 border border-white/5 text-stone-400 text-xs">
+                    <p class="text-center italic py-6">لا يوجد تسجيلات محفوظة حالياً في الذاكرة المحلية</p>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 9. MIDI CONFIGURATION PAGE -->
+            @if (activePage() === 'midi') {
+              <div class="grid grid-cols-2 gap-6 h-full">
+                <!-- MIDI Devices scanning lists -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">MIDI PORTS CONNECTIVITY</span>
+                  <div class="bg-black/40 rounded-lg p-4 my-4 text-xs font-mono text-emerald-500 h-44 overflow-auto border border-white/5">
+                    <p class="text-[#00b894]">● SCANNING ACTIVE MIDI PORT PORTS...</p>
+                    <p class="text-stone-500 mt-2">No physical MIDI devices attached. Standard USB WebMIDI scanning.</p>
+                  </div>
+                </div>
+
+                <!-- CC mapping config table -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-stone-300 font-mono">MIDI CC CONTROLLERS ASSIGNMENTS</span>
+                  <div class="mt-4 flex flex-col gap-2">
+                    <div class="flex justify-between items-center bg-black/25 p-2 rounded border border-white/5 text-xs text-stone-300">
+                      <span>CC 1 (Modulation Wheel)</span>
+                      <strong class="text-[#f5c542]">VIBRATO LFO</strong>
+                    </div>
+                    <div class="flex justify-between items-center bg-black/25 p-2 rounded border border-white/5 text-xs text-stone-300 mt-1">
+                      <span>CC 7 (Channel Volume)</span>
+                      <strong class="text-[#00b894]">MASTER VOLUME</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 10. SCRIPT AUTOMATION PAGE -->
+            @if (activePage() === 'script') {
+              <div class="grid grid-cols-3 gap-6 h-full">
+                <!-- Preloaded code files selector -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5">
+                  <span class="text-xs font-black text-stone-300">PRESETS CODE AUTOPLAY SCRIPT</span>
+                  <div class="flex flex-col gap-2 mt-4 text-right">
+                    <button class="py-2.5 px-4 text-xs font-bold bg-[#1c1d24] border border-white/5 hover:border-[#f5c542] rounded text-stone-300 cursor-pointer text-right transition-all">
+                      🕌 عزف مقام البياتي أوتوماتيكياً (Auto Bayati scale)
+                    </button>
+                    <button class="py-2.5 px-4 text-xs font-bold bg-[#1c1d24] border border-white/5 hover:border-[#f5c542] rounded text-stone-300 cursor-pointer text-right transition-all mt-1">
+                      🎵 عزف كوردات صعود وهبوط (Arpeggiator sequence)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Code Terminal editor textarea -->
+                <div class="col-span-2 bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-[#f5c542] tracking-wider font-mono">AUTOMATION JS EDITOR TERMINAL</span>
+                  <textarea class="w-full h-44 bg-black/50 rounded-lg p-4 font-mono text-[#00b894] text-xs border border-white/5 mt-3 outline-none" dir="ltr" readonly>
+// Auto Play Scale Automation Script
+function playBayatiScale() {
+  const bayatiSequence = [60, 61.5, 63, 65, 67, 68.5, 70, 72];
+  bayatiSequence.forEach((note, index) => {
+    setTimeout(() => {
+      synth.play(note, 0.7);
+    }, index * 250);
+  });
+}
+                  </textarea>
+                  <button class="w-full py-3 mt-3 text-xs font-black bg-[#00b894] text-black rounded-lg cursor-pointer hover:bg-emerald-400 transition-all uppercase">
+                    🚀 Execute Automation Script (تشغيل البرنامج)
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- 11. SAVED MY SETTINGS PRESETS SLOT MANAGER -->
+            @if (activePage() === 'my_settings') {
+              <div class="grid grid-cols-2 gap-6 h-full">
+                <!-- Save new setup form -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <div>
+                    <span class="text-xs font-black text-[#f5c542] tracking-wider">SAVE CURRENT SYNTH STATE</span>
+                    <p class="text-[10px] text-stone-400 mt-1">يحفظ هذا الخيار الإيقاع النشط والآلة ودرجة الصوت لسهولة استدعائها لاحقاً.</p>
+                  </div>
+
+                  <div class="my-4">
+                    <input type="text" placeholder="اسم الملف المحفوظ..." class="w-full p-3 bg-black/30 border border-white/5 rounded-lg outline-none text-xs text-white">
+                  </div>
+
+                  <button class="w-full py-3 text-xs font-black bg-[#f5c542] text-black rounded-lg cursor-pointer hover:bg-amber-400 transition-all uppercase">
+                    💾 SAVE PRESET SETUP
+                  </button>
+                </div>
+
+                <!-- Saved setups slots list -->
+                <div class="bg-[#2c3038] p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <span class="text-xs font-black text-stone-300">STORED CONFIGURATION SLOTS</span>
+                  <div class="flex-1 bg-stone-900/60 rounded-lg p-4 my-3 border border-white/5 text-xs text-stone-400 text-center flex items-center justify-center italic">
+                    لا يوجد ملفات محفوظة حالياً في البنك الداخلي.
+                  </div>
+                </div>
+              </div>
+            }
+
+          </div>
+          
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+</div>

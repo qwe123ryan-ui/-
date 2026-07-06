@@ -1,0 +1,17 @@
+/* ORG24 Workstation Stylesheet */
+
+/* الوضع الأفقي للهاتف — التصميم الأساسي */
+@media (orientation: landscape) and (max-width: 844px) {
+  .workstation {
+    transform: scale(0.44);
+    transform-origin: top left;
+    width: 1920px;
+    height: 720px;
+  }
+}
+
+/* إخفاء بعض العناصر في الشاشات الصغيرة */
+@media (max-width: 480px) {
+  .zone-b, .zone-d { display: none; } /* الأعمدة الوسطى */
+  .main-display { height: 180px; }
+}
